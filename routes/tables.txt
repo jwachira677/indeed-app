@@ -1,0 +1,44 @@
+ALTER TABLE users
+MODIFY COLUMN email VARCHAR(255) NULL;
+
+INSERT INTO loans (
+    user_id,
+    loan_number,
+    loan_type,
+    amount_taken,
+    amount_due,
+    interest_rate,
+    interest_amount,
+    total_amount_payable,
+    date_taken,
+    date_due,
+    payment_frequency,
+    installment_amount,
+    installments_count,
+    installments_paid,
+    status,
+    purpose,
+    notes,
+    created_at,
+    updated_at
+) VALUES (
+    22,                                     -- user_id
+    'LN-2026-TEST001',                      -- loan_number
+    'ordinary',                             -- loan_type
+    20000.00,                               -- amount_taken
+    20000.00,                               -- amount_due (same as taken for now)
+    0.00,                                   -- interest_rate (will be calculated on payment)
+    0.00,                                   -- interest_amount (will be calculated on payment)
+    20000.00,                               -- total_amount_payable
+    '2026-07-01 09:00:00',                  -- date_taken (1st July 2026)
+    '2026-08-01 09:00:00',                  -- date_due (1st August 2026)
+    'monthly',                              -- payment_frequency
+    20000.00,                               -- installment_amount (full amount due)
+    1,                                      -- installments_count (1 month loan)
+    0,                                      -- installments_paid
+    'active',                               -- status
+    'Short-term loan',                      -- purpose
+    'Due on 1st August 2026',               -- notes
+    NOW(),                                  -- created_at
+    NOW()                                   -- updated_at
+);
