@@ -60,25 +60,30 @@
                     <span>Loans</span>
                     <i class="bi bi-chevron-down ms-auto transition-transform"></i>
                 </a>
-                <div class="collapse {{ request()->routeIs('loans.*') ? 'show' : '' }}" id="loansMenu">
-                    <ul class="nav nav-pills flex-column ms-4 mt-1">
-                        <li class="nav-item">
-                            <a href="{{ route('loans.instant') }}" class="nav-link py-2 text-white-50 {{ request()->routeIs('loans.instant') ? 'active' : '' }}">
-                                <i class="bi bi-lightning-fill me-2 text-warning"></i> Instant Loans
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('loans.ordinary') }}" class="nav-link py-2 text-white-50 {{ request()->routeIs('loans.ordinary') ? 'active' : '' }}">
-                                <i class="bi bi-clock-history me-2 text-info"></i> Ordinary Loans
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('loans.eligibility.form') }}" class="nav-link py-2 text-white-50 {{ request()->routeIs('loans.ordinary') ? 'active' : '' }}">
-                                <i class="bi bi-clock-history me-2 text-info"></i> Ordinary Loans
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+<div class="collapse {{ request()->routeIs('loans.*') ? 'show' : '' }}" id="loansMenu">
+    <ul class="nav nav-pills flex-column ms-4 mt-1">
+        <li class="nav-item">
+            <a href="{{ route('loans.index') }}" class="nav-link py-2 text-white-50 {{ request()->routeIs('loans.index') ? 'active' : '' }}">
+                <i class="bi bi-list-ul me-2 text-primary"></i> All Loans
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ route('loans.eligibility.form') }}" class="nav-link py-2 text-white-50 {{ request()->routeIs('loans.eligibility.*') ? 'active' : '' }}">
+                <i class="bi bi-calculator me-2 text-success"></i> Check Eligibility
+            </a>
+        </li>
+<li class="nav-item">
+    <a href="{{ route('loans.by-status', 'active') }}" class="nav-link py-2 text-white-50 {{ request()->routeIs('loans.by-status') && request()->route('status') == 'active' ? 'active' : '' }}">
+        <i class="bi bi-play-circle me-2 text-success"></i> Active Loans
+        <span class="badge bg-success bg-opacity-25 text-success rounded-pill ms-auto">
+            {{ App\Models\Loan::active()->count() }}
+        </span>
+    </a>
+</li>
+
+
+    </ul>
+</div>
             </li>
             <li class="nav-item mb-1">
     <a href="{{ route('fines.index') }}" 

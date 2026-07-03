@@ -55,18 +55,94 @@
                             <div class="input-group">
                                 <span class="input-group-text">KES</span>
                                 <input type="number" 
-                                       step="0.01" 
+                                       step="1" 
                                        min="1"
                                        class="form-control @error('amount') is-invalid @enderror" 
                                        id="amount" 
                                        name="amount" 
                                        value="{{ old('amount', $result['requested_amount'] ?? '') }}" 
                                        placeholder="Enter loan amount"
+                                       oninput="updateLoanDetails()"
                                        required>
                             </div>
                             @error('amount')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                        </div>
+
+                        <!-- Loan Type Selection -->
+                        <div class="mb-3">
+                            <label class="form-label">Loan Type *</label>
+                            <div class="d-flex gap-3 flex-wrap">
+                                @foreach($loanTypes ?? [] as $type)
+                                <div class="form-check flex-grow-1">
+                                    <input class="form-check-input" 
+                                        type="radio" 
+                                        name="loan_type" 
+                                        id="loan_{{ $type->slug }}" 
+                                        value="{{ $type->slug }}"
+                                        {{ old('loan_type', $result['loan_type']->slug ?? '') == $type->slug ? 'checked' : '' }}
+                                        data-interest="{{ $type->interest_rate }}"
+                                        data-slug="{{ $type->slug }}"
+                                        onchange="updateLoanDetails()">
+                                    <label class="form-check-label" for="loan_{{ $type->slug }}">
+                                        <span class="fw-semibold">{{ $type->name }}</span>
+                                        <br>
+                                        <small class="text-secondary">
+                                            @if($type->slug == 'instant')
+                                                7 days | {{ number_format($type->interest_rate, 2) }}% interest
+                                            @else
+                                                Tiered duration | {{ number_format($type->interest_rate, 2) }}% interest
+                                            @endif
+                                        </small>
+                                    </label>
+                                </div>
+                                @endforeach
+                            </div>
+                            @error('loan_type')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Read-only Loan Details -->
+                        <div class="bg-light rounded-3 p-3 mb-3">
+                            <h6 class="fw-bold text-secondary mb-2" style="font-size: 0.8rem;">
+                                <i class="bi bi-info-circle me-1"></i> Loan Details
+                            </h6>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="text-secondary" style="font-size: 0.75rem;">Duration</label>
+                                    <input type="text" 
+                                           id="duration_display" 
+                                           class="form-control form-control-sm bg-white" 
+                                           value="-- Select loan type --"
+                                           readonly>
+                                </div>
+                                <div class="col-6">
+                                    <label class="text-secondary" style="font-size: 0.75rem;">Due Date</label>
+                                    <input type="text" 
+                                           id="due_date_display" 
+                                           class="form-control form-control-sm bg-white" 
+                                           value="--"
+                                           readonly>
+                                </div>
+                                <div class="col-6">
+                                    <label class="text-secondary" style="font-size: 0.75rem;">Interest Rate</label>
+                                    <input type="text" 
+                                           id="interest_display" 
+                                           class="form-control form-control-sm bg-white" 
+                                           value="--"
+                                           readonly>
+                                </div>
+                                <div class="col-6">
+                                    <label class="text-secondary" style="font-size: 0.75rem;">Total Payable</label>
+                                    <input type="text" 
+                                           id="total_payable_display" 
+                                           class="form-control form-control-sm bg-white" 
+                                           value="--"
+                                           readonly>
+                                </div>
+                            </div>
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100">
@@ -79,172 +155,299 @@
 
         <!-- Results Section -->
         <div class="col-lg-6 mt-4 mt-lg-0">
-@if(isset($result))
-<div class="card border-0 shadow-sm">
-    <div class="card-body">
-        <h6 class="fw-bold text-primary mb-3">
-            <i class="bi bi-graph-up-arrow me-2"></i> Eligibility Results
-        </h6>
+            @if(isset($result))
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="fw-bold text-primary mb-3">
+                        <i class="bi bi-graph-up-arrow me-2"></i> Eligibility Results
+                    </h6>
 
-        <!-- Financial Summary -->
-        <div class="row g-3 mb-4">
-            <div class="col-6">
-                <div class="bg-light rounded-3 p-3 text-center">
-                    <p class="text-secondary mb-1" style="font-size: 0.75rem;">Total Savings</p>
-                    <h5 class="fw-bold text-primary mb-0">
-                        KES {{ number_format($result['total_savings'], 2) }}
-                    </h5>
-                </div>
-            </div>
-            <div class="col-6">
-                <div class="bg-light rounded-3 p-3 text-center">
-                    <p class="text-secondary mb-1" style="font-size: 0.75rem;">Active Loan Balance</p>
-                    <h5 class="fw-bold text-danger mb-0">
-                        - KES {{ number_format($result['active_loan_balance'], 2) }}
-                    </h5>
-                </div>
-            </div>
-        </div>
+                    <!-- Loan Type Info -->
+                    <div class="alert alert-info">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <div>
+                                <strong>{{ $result['loan_type']->name ?? 'N/A' }}</strong>
+                                <br>
+                                <small>
+                                    Duration: {{ $result['duration_label'] ?? $result['duration_days'] . ' days' }}
+                                    | Due: {{ isset($result['due_date']) ? $result['due_date']->format('M d, Y') : 'N/A' }}
+                                    | Rate: {{ $result['interest_rate'] ?? 0 }}%
+                                </small>
+                            </div>
+                            <span class="badge bg-primary">
+                                Interest: KES {{ number_format($result['interest_amount'] ?? 0, 2) }}
+                            </span>
+                        </div>
+                    </div>
 
-        <!-- Available Savings -->
-        <div class="bg-primary bg-opacity-10 rounded-3 p-3 mb-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <p class="text-secondary mb-0" style="font-size: 0.8rem;">Available Savings</p>
-                    <h5 class="fw-bold text-primary mb-0">
-                        KES {{ number_format($result['available_savings'], 2) }}
-                    </h5>
-                </div>
-                <div>
-                    <p class="text-secondary mb-0" style="font-size: 0.8rem;">Loan Limit (75%)</p>
-                    <h5 class="fw-bold text-info mb-0">
-                        KES {{ number_format($result['loan_limit'], 2) }}
-                    </h5>
-                </div>
-            </div>
-        </div>
+                    <!-- Financial Summary -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="bg-light rounded-3 p-3 text-center">
+                                <p class="text-secondary mb-1" style="font-size: 0.75rem;">Total Savings</p>
+                                <h5 class="fw-bold text-primary mb-0">
+                                    KES {{ number_format($result['total_savings'], 2) }}
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-light rounded-3 p-3 text-center">
+                                <p class="text-secondary mb-1" style="font-size: 0.75rem;">Active Loan Balance</p>
+                                <h5 class="fw-bold text-danger mb-0">
+                                    - KES {{ number_format($result['active_loan_balance'], 2) }}
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
 
-        <!-- Requested Amount -->
-        <div class="bg-light rounded-3 p-3 mb-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <p class="text-secondary mb-0" style="font-size: 0.8rem;">Requested Amount</p>
-                    <h5 class="fw-bold mb-0">
-                        KES {{ number_format($result['requested_amount'], 2) }}
-                    </h5>
-                </div>
-                <div class="text-end">
-                    <p class="text-secondary mb-0" style="font-size: 0.8rem;">Eligibility</p>
-                    @if($result['qualifies'])
-                        <span class="badge bg-success rounded-pill fs-6">
-                            <i class="bi bi-check-circle me-1"></i> Qualified
-                        </span>
-                    @else
-                        <span class="badge bg-danger rounded-pill fs-6">
-                            <i class="bi bi-x-circle me-1"></i> Not Qualified
-                        </span>
-                    @endif
-                </div>
-            </div>
-        </div>
+                    <!-- Available Savings -->
+                    <div class="bg-primary bg-opacity-10 rounded-3 p-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <div>
+                                <p class="text-secondary mb-0" style="font-size: 0.8rem;">Available Savings</p>
+                                <h5 class="fw-bold text-primary mb-0">
+                                    KES {{ number_format($result['available_savings'], 2) }}
+                                </h5>
+                            </div>
+                            <div>
+                                <p class="text-secondary mb-0" style="font-size: 0.8rem;">Loan Limit (75%)</p>
+                                <h5 class="fw-bold text-info mb-0">
+                                    KES {{ number_format($result['loan_limit'], 2) }}
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
 
-        <!-- Result Message -->
-        @if($result['qualifies'])
-            <div class="alert alert-success">
-                <i class="bi bi-check-circle-fill me-2"></i>
-                <strong>Congratulations!</strong> 
-                {{ $result['user']->name }} qualifies for a loan of 
-                <strong>KES {{ number_format($result['requested_amount'], 2) }}</strong>.
-                <br>
-                <small class="text-success">
-                    <i class="bi bi-info-circle me-1"></i>
-                    Available savings after active loan: KES {{ number_format($result['available_savings'], 2) }}
-                </small>
-            </div>
-            
-            <div class="d-grid gap-2">
-                <a href="{{ route('loans.instant') }}" class="btn btn-success">
-                    <i class="bi bi-lightning-fill me-2"></i> Apply for Instant Loan
-                </a>
-                <a href="{{ route('loans.ordinary') }}" class="btn btn-outline-primary">
-                    <i class="bi bi-clock-history me-2"></i> Apply for Ordinary Loan
-                </a>
-            </div>
-        @else
-            <div class="alert alert-warning">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                <div>
-                    <strong>Not Qualified</strong>
-                    <ul class="mb-0 mt-2" style="padding-left: 1.2rem;">
-                        <li>Requested: KES {{ number_format($result['requested_amount'], 2) }}</li>
-                        <li>Loan Limit: KES {{ number_format($result['loan_limit'], 2) }}</li>
-                        <li class="text-danger">
-                            <strong>Shortfall: KES {{ number_format($result['shortfall'], 2) }}</strong>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="alert alert-info">
-                <i class="bi bi-lightbulb me-2"></i>
-                <strong>How to qualify:</strong>
-                <ul class="mb-0 mt-1" style="padding-left: 1.2rem;">
-                    <li>Increase your savings by KES {{ number_format($result['shortfall'] / 0.75, 2) }}</li>
-                    <li>Or reduce your active loan balance by KES {{ number_format($result['shortfall'], 2) }}</li>
-                </ul>
-            </div>
-        @endif
+                    <!-- Requested Amount -->
+                    <div class="bg-light rounded-3 p-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <div>
+                                <p class="text-secondary mb-0" style="font-size: 0.8rem;">Requested Amount</p>
+                                <h5 class="fw-bold mb-0">
+                                    KES {{ number_format($result['requested_amount'], 2) }}
+                                </h5>
+                                @if(isset($result['total_payable']))
+                                <small class="text-secondary">
+                                    + Interest: KES {{ number_format($result['interest_amount'] ?? 0, 2) }}
+                                    = KES {{ number_format($result['total_payable'], 2) }}
+                                </small>
+                                @endif
+                            </div>
+                            <div class="text-end">
+                                <p class="text-secondary mb-0" style="font-size: 0.8rem;">Eligibility</p>
+                                @if($result['qualifies'])
+                                    <span class="badge bg-success rounded-pill fs-6">
+                                        <i class="bi bi-check-circle me-1"></i> Qualified
+                                    </span>
+                                @else
+                                    <span class="badge bg-danger rounded-pill fs-6">
+                                        <i class="bi bi-x-circle me-1"></i> Not Qualified
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
 
-        <!-- Quick Stats -->
-        <hr>
-        <div class="row text-center">
-            <div class="col-4">
-                <p class="text-secondary mb-0" style="font-size: 0.7rem;">Savings</p>
-                <span class="fw-bold" style="font-size: 0.9rem;">
-                    {{ number_format(($result['total_savings'] / ($result['total_savings'] + $result['requested_amount'])) * 100, 1) }}%
-                </span>
-            </div>
-            <div class="col-4">
-                <p class="text-secondary mb-0" style="font-size: 0.7rem;">Loan Request</p>
-                <span class="fw-bold" style="font-size: 0.9rem;">
-                    {{ number_format(($result['requested_amount'] / ($result['total_savings'] + $result['requested_amount'])) * 100, 1) }}%
-                </span>
-            </div>
-            <div class="col-4">
-                <p class="text-secondary mb-0" style="font-size: 0.7rem;">Utilization</p>
-                <span class="fw-bold" style="font-size: 0.9rem;">
-                    {{ number_format(($result['requested_amount'] / $result['loan_limit']) * 100, 1) }}%
-                </span>
-            </div>
+                    <!-- Result Message -->
+<!-- Result Message -->
+@if($result['qualifies'])
+    <div class="alert alert-success">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <strong>{{ $result['user']->name }}</strong> qualifies for a <strong>{{ $result['loan_type']->name }}</strong> of 
+        <strong>KES {{ number_format($result['requested_amount'], 2) }}</strong>.
+        <br>
+        <small class="text-success">
+            <i class="bi bi-info-circle me-1"></i>
+            Duration: {{ $result['duration_label'] ?? $result['duration_days'] . ' days' }}
+            | Due: {{ $result['due_date']->format('M d, Y') }}
+            | Available savings after active loan: KES {{ number_format($result['available_savings'], 2) }}
+        </small>
+    </div>
+    
+    <!-- Apply Form -->
+    <div class="card border-0 bg-light">
+        <div class="card-body">
+            <h6 class="fw-bold mb-3">Apply for this Loan</h6>
+            <form method="POST" action="{{ route('loans.apply') }}">
+                @csrf
+                <input type="hidden" name="user_id" value="{{ $result['user']->id }}">
+                <input type="hidden" name="amount" value="{{ $result['requested_amount'] }}">
+                <input type="hidden" name="loan_type" value="{{ $result['loan_type']->slug }}">
+
+                <div class="mb-2">
+                    <label for="purpose" class="form-label" style="font-size: 0.85rem;">Purpose of Loan</label>
+                    <input type="text" 
+                           class="form-control form-control-sm" 
+                           id="purpose" 
+                           name="purpose" 
+                           placeholder="e.g., Business expansion, Medical expenses, etc."
+                           required>
+                </div>
+
+                <div class="mb-2">
+                    <label for="notes" class="form-label" style="font-size: 0.85rem;">Additional Notes</label>
+                    <textarea class="form-control form-control-sm" 
+                              id="notes" 
+                              name="notes" 
+                              rows="2" 
+                              placeholder="Any additional information..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">
+                    <i class="bi bi-check2-circle me-2"></i> Submit Application
+                </button>
+            </form>
         </div>
     </div>
-</div>
+@else
+    <!-- Not qualified message -->
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <div>
+            <strong>Not Qualified</strong>
+            <ul class="mb-0 mt-2" style="padding-left: 1.2rem;">
+                <li>Requested: KES {{ number_format($result['requested_amount'], 2) }}</li>
+                <li>Loan Limit: KES {{ number_format($result['loan_limit'], 2) }}</li>
+                <li class="text-danger">
+                    <strong>Shortfall: KES {{ number_format($result['shortfall'], 2) }}</strong>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="alert alert-info">
+        <i class="bi bi-lightbulb me-2"></i>
+        <strong>How to qualify:</strong>
+        <ul class="mb-0 mt-1" style="padding-left: 1.2rem;">
+            <li>Increase your savings by KES {{ number_format($result['shortfall'] / 0.75, 2) }}</li>
+            <li>Or reduce your active loan balance by KES {{ number_format($result['shortfall'], 2) }}</li>
+        </ul>
+    </div>
 @endif
 
+
+                </div>
+            </div>
+            @else
+            <!-- Empty State -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-calculator-fill text-secondary" style="font-size: 4rem;"></i>
+                    <h5 class="fw-bold mt-3">No Results Yet</h5>
+                    <p class="text-secondary" style="font-size: 0.9rem;">
+                        Select a member, choose loan type, and enter the loan amount<br>
+                        to check eligibility.
+                    </p>
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <span class="badge bg-primary">75% Limit</span>
+                        <span class="badge bg-success">Instant - 7 Days</span>
+                        <span class="badge bg-info">Ordinary - Tiered</span>
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
+    </div>
 </div>
 
 @push('scripts')
 <script>
-    // Auto-submit the form when user selects a member (optional)
+    // Get loan types data from PHP
+    const loanTypesData = @json($loanTypes);
+
     document.addEventListener('DOMContentLoaded', function() {
-        const userSelect = document.getElementById('user_id');
-        const amountInput = document.getElementById('amount');
+        // Initialize loan details
+        updateLoanDetails();
         
-        // If there's a selected user and amount, show results
+        // If there's a result, scroll to it
         @if(isset($result))
-            // Scroll to results
             document.querySelector('.col-lg-6.mt-4').scrollIntoView({ 
                 behavior: 'smooth', 
                 block: 'start' 
             });
         @endif
+
+        // Add event listener for amount input
+        const amountInput = document.getElementById('amount');
+        if (amountInput) {
+            amountInput.addEventListener('input', updateLoanDetails);
+        }
     });
 
-    // Function to increase savings (placeholder)
-    function increaseAmount() {
-        // You can implement a modal or redirect to savings page
-        alert('Please increase savings by saving more in the current financial year.\nVisit the Savings section to add more savings.');
+    function updateLoanDetails() {
+        const amount = parseFloat(document.getElementById('amount').value) || 0;
+        const selectedRadio = document.querySelector('input[name="loan_type"]:checked');
+        
+        if (!selectedRadio) {
+            // No loan type selected
+            document.getElementById('duration_display').value = '-- Select loan type --';
+            document.getElementById('due_date_display').value = '--';
+            document.getElementById('interest_display').value = '--';
+            document.getElementById('total_payable_display').value = '--';
+            return;
+        }
+
+        const loanSlug = selectedRadio.dataset.slug;
+        const interestRate = parseFloat(selectedRadio.dataset.interest) || 0;
+        
+        // Find the loan type object
+        const loanType = loanTypesData.find(type => type.slug === loanSlug);
+        
+        if (!loanType) {
+            return;
+        }
+
+        let durationDays = 0;
+        let durationLabel = '';
+
+        if (loanSlug === 'instant') {
+            durationDays = 7;
+            durationLabel = '7 days (Instant)';
+        } else if (loanSlug === 'ordinary') {
+            // For ordinary loans, find the tier based on amount
+            if (amount > 0) {
+                // Get duration tiers from the loan type
+                const tiers = @json($loanTypes->where('slug', 'ordinary')->first()->durations ?? []);
+                const tier = tiers.find(t => amount >= t.min_amount && amount <= t.max_amount);
+                if (tier) {
+                    durationDays = tier.duration_days;
+                    durationLabel = tier.duration_days + ' days (Tier)';
+                } else {
+                    durationDays = 30;
+                    durationLabel = '30 days (Default)';
+                }
+            } else {
+                document.getElementById('duration_display').value = 'Enter amount to calculate';
+                document.getElementById('due_date_display').value = '--';
+                document.getElementById('interest_display').value = interestRate + '%';
+                document.getElementById('total_payable_display').value = '--';
+                return;
+            }
+        }
+
+        // Calculate due date
+        const dueDate = new Date();
+        dueDate.setDate(dueDate.getDate() + durationDays);
+        const dateString = dueDate.toLocaleDateString('en-US', { 
+            weekday: 'short', 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric' 
+        });
+
+        // Update displays
+        document.getElementById('duration_display').value = durationLabel || '--';
+        document.getElementById('due_date_display').value = dateString;
+        document.getElementById('interest_display').value = interestRate + '%';
+
+        // Calculate total payable
+        if (amount > 0 && interestRate > 0) {
+            const interestAmount = (amount * interestRate) / 100;
+            const totalPayable = amount + interestAmount;
+            document.getElementById('total_payable_display').value = 'KES ' + totalPayable.toFixed(2);
+        } else {
+            document.getElementById('total_payable_display').value = 'KES 0.00';
+        }
     }
 </script>
 @endpush
@@ -272,10 +475,35 @@
         padding: 0.5rem 1rem;
     }
     
-    /* Responsive adjustments */
+    .form-check {
+        padding: 0.75rem 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        flex: 1;
+        min-width: 150px;
+    }
+    
+    .form-check:hover {
+        border-color: #0d6efd;
+        background-color: #f8f9fa;
+    }
+    
+    .form-check .form-check-input:checked + .form-check-label {
+        color: #0d6efd;
+    }
+    
+    .form-check:has(.form-check-input:checked) {
+        border-color: #0d6efd;
+        background-color: #f0f7ff;
+    }
+    
     @media (max-width: 768px) {
         .col-lg-6.mt-4.mt-lg-0 {
             margin-top: 1.5rem !important;
+        }
+        .form-check {
+            flex: 1 1 100%;
         }
     }
 </style>

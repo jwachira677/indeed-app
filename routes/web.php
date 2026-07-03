@@ -52,17 +52,36 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/users/{user}/suspend', [UserController::class, 'suspend'])->name('users.suspend');
 });
 
-Route::middleware(['auth'])->group(function () {
 
+
+Route::middleware(['auth'])->group(function () {
+    // Loan Eligibility
     Route::get('/loans/eligibility', [LoanController::class, 'eligibilityForm'])
         ->name('loans.eligibility.form');
     Route::post('/loans/eligibility', [LoanController::class, 'checkEligibility'])
         ->name('loans.eligibility.check');
 
+    // Loan Application
+    Route::post('/loans/apply', [LoanController::class, 'apply'])->name('loans.apply');
+
+    // Loan Type Pages
     Route::get('/loans/instant', [LoanController::class, 'instant'])->name('loans.instant');
     Route::get('/loans/ordinary', [LoanController::class, 'ordinary'])->name('loans.ordinary');
 
-    Route::resource('loans', LoanController::class);
+    // API Routes
+    Route::get('/loans/duration-tiers', [LoanController::class, 'getDurationTiers'])->name('loans.duration-tiers');
+
+    // Resource routes (this handles index, show, store, update, destroy)
+    Route::resource('loans', LoanController::class)->only(['index', 'show']);
+
+    // Additional custom routes
+    Route::get('/loans/status/{status}', [LoanController::class, 'byStatus'])->name('loans.by-status');
+    
+    // Loan Actions
+    Route::put('/loans/{loan}/approve', [LoanController::class, 'approve'])->name('loans.approve');
+    Route::put('/loans/{loan}/activate', [LoanController::class, 'activate'])->name('loans.activate');
+    Route::put('/loans/{loan}/cancel', [LoanController::class, 'cancel'])->name('loans.cancel');
+    Route::put('/loans/{loan}/complete', [LoanController::class, 'complete'])->name('loans.complete');
 });
 
 
@@ -128,9 +147,6 @@ Route::get('/loans/ordinary', function () {
     return view('loans.ordinary');
 })->name('loans.ordinary');
 
-// All Loans (optional - for overview page)
-Route::get('/loans', function () {
-    return view('loans.index');
-});
+
 
 require __DIR__.'/auth.php';
