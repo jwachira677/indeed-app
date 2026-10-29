@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FineController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\TeacherController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -50,7 +52,24 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     Route::put('/users/{user}/activate', [UserController::class, 'activate'])->name('users.activate');
     Route::put('/users/{user}/suspend', [UserController::class, 'suspend'])->name('users.suspend');
+
+    Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+    Route::get('/roles/create', [RoleController::class, 'create'])->name('roles.create');
+    Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
+    Route::get('/roles/{role}', [RoleController::class, 'show'])->name('roles.show');
+    Route::get('/roles/{role}/edit', [RoleController::class, 'edit'])->name('roles.edit');
+    Route::put('/roles/{role}', [RoleController::class, 'update'])->name('roles.update');
+    Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
+    Route::put('/roles/{role}/activate', [RoleController::class, 'activate'])->name('roles.activate');
+    Route::put('/roles/{role}/suspend', [RoleController::class, 'suspend'])->name('roles.suspend');
+    Route::put('/roles/{role}/assign-permissions', [RoleController::class, 'assignPermissions'])->name('roles.assign-permissions');
+    Route::get('/roles/{role}/permissions', [RoleController::class, 'permissions'])->name('roles.permissions');
+    Route::get('/permissions', [RoleController::class, 'permissions'])->name('permissions');
+    Route::get('/teachers', [TeacherController::class, 'index'])->name('teachers.index');
+
 });
+
+
 
 
 
@@ -97,9 +116,6 @@ Route::get('/analytics', function () {
 
 
 
-Route::get('/users/create', function () {
-    return view('users.create');
-})->name('users.create');
 
 // Products
 Route::get('/products', function () {

@@ -1,3 +1,4 @@
+/var/www/html/indeed-app/resources/views/fines/create.blade.php
 @extends('layouts.app')
 
 @section('title', 'Issue Fine')

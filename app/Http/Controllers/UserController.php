@@ -63,7 +63,7 @@ class UserController extends Controller
     public function create()
     {
         $roles = Role::all();
-        return view('auth.users-create', compact('roles'));
+        return view('users.form', compact('roles'));
     }
 
     public function store(Request $request)
