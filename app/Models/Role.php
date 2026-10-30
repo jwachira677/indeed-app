@@ -1,60 +1,68 @@
 <?php
 
+// If you already have app/Models/Role.php, merge the constant, the relationships
+// and the permission methods into it instead of replacing the file.
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Cache;
 
 class Role extends Model
 {
-    use HasFactory;
+    public const ADMIN = 'admin';
 
-    protected $fillable = [
-        'name',
-        'slug',
-        'description',
-        'is_default',
-    ];
+    protected $fillable = ['name', 'slug', 'description', 'is_default'];
 
-    protected $casts = [
-        'is_default' => 'boolean',
-    ];
+    /** Per-request memo so a page with 30 @can checks hits the cache once. */
+    protected ?array $permissionSlugsMemo = null;
 
-    // Relationships
-    public function users()
+    protected static function booted(): void
+    {
+        static::saved(fn (Role $role) => $role->flushPermissionCache());
+        static::deleted(fn (Role $role) => $role->flushPermissionCache());
+    }
+
+    public function users(): HasMany
     {
         return $this->hasMany(User::class);
     }
 
-    // Helper methods
+    public function permissions(): BelongsToMany
+    {
+        return $this->belongsToMany(Permission::class);
+    }
+
     public function isAdmin(): bool
     {
-        return $this->slug === 'admin';
+        return $this->slug === self::ADMIN;
     }
 
-    public function isMember(): bool
+    /** @return string[] */
+    public function permissionSlugs(): array
     {
-        return $this->slug === 'member';
+        return $this->permissionSlugsMemo ??= Cache::rememberForever(
+            $this->permissionCacheKey(),
+            fn () => $this->permissions()->pluck('permissions.slug')->all()
+        );
     }
 
-    public function isGuest(): bool
+    public function syncPermissions(iterable $permissionIds): void
     {
-        return $this->slug === 'guest';
+        $this->permissions()->sync($permissionIds);
+        $this->flushPermissionCache();
     }
 
-    // Scopes
-    public function scopeDefault($query)
+    public function flushPermissionCache(): void
     {
-        return $query->where('is_default', true);
+        $this->permissionSlugsMemo = null;
+        Cache::forget($this->permissionCacheKey());
     }
 
-    public function scopeAdmin($query)
+    protected function permissionCacheKey(): string
     {
-        return $query->where('slug', 'admin');
-    }
-
-    public function scopeMember($query)
-    {
-        return $query->where('slug', 'member');
+        return "role.{$this->id}.permissions";
     }
 }

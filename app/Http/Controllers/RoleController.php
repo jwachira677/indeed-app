@@ -57,7 +57,7 @@ class RoleController extends Controller
     public function create()
     {
         try {
-            return view('roles.create');
+            return view('roles.form');
         } catch (\Exception $e) {
             Log::error('Error loading create role form: ' . $e->getMessage());
             return redirect()->route('roles.index')->with('error', 'Could not load the form.');
@@ -119,7 +119,7 @@ class RoleController extends Controller
     public function edit(Role $role)
     {
         try {
-            return view('roles.edit', compact('role'));
+            return view('roles.form', compact('role'));
         } catch (\Exception $e) {
             Log::error('Error loading edit form for role ' . $role->id . ': ' . $e->getMessage());
             return redirect()->route('roles.index')->with('error', 'Could not load the edit form.');

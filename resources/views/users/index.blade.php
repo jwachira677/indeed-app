@@ -9,9 +9,11 @@
             <h4 class="fw-bold mb-0">Users Management</h4>
             <p class="text-secondary mb-0">Manage all registered users and members</p>
         </div>
+        @can('users.create')
         <a href="{{ route('users.create') }}" class="btn btn-primary">
             <i class="bi bi-person-plus me-2"></i> Add User
         </a>
+         @endcan
     </div>
 
     <!-- Stats Cards -->

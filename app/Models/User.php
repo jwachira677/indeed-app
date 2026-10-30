@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Concerns\HasRolePermissions;
 
 #[Fillable([
     'name', 
@@ -28,7 +29,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRolePermissions;
 
     /**
      * Get the attributes that should be cast.
@@ -56,30 +57,7 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
-    public function loans()
-    {
-        return $this->hasMany(Loan::class);
-    }
 
-    public function activeLoans()
-    {
-        return $this->hasMany(Loan::class)->whereIn('status', ['approved', 'active']);
-    }
-
-    public function loanPayments()
-    {
-        return $this->hasMany(LoanPayment::class);
-    }
-
-    public function guarantorLoans()
-    {
-        return $this->hasMany(LoanGuarantor::class);
-    }
-
-    public function approvedLoans()
-    {
-        return $this->hasMany(Loan::class, 'approved_by');
-    }
 
     public function getTotalLoanBalanceAttribute(): float
     {

@@ -3,12 +3,12 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SavingController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\FineController;
+use App\Http\Controllers\Fee\FeetypeController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TeacherController;
-
+use App\Http\Controllers\PermissionController;
 Route::get('/', function () {
     return view('welcome');
 });
@@ -23,23 +23,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware(['auth'])->group(function () {
-    Route::resource('savings', SavingController::class);
-    Route::put('savings/{saving}/approve', [SavingController::class, 'approve'])->name('savings.approve');
-    Route::put('savings/{saving}/reject', [SavingController::class, 'reject'])->name('savings.reject');
-    Route::get('members/{member}/savings', [SavingController::class, 'memberSavings'])->name('members.savings');
-    Route::get('savings/summary', [SavingController::class, 'summary'])->name('savings.summary');
-    Route::get('savings/export', [SavingController::class, 'export'])->name('savings.export'); 
-});
-
-
-Route::middleware(['auth'])->group(function () {
-    Route::resource('fines', FineController::class);
-    Route::post('fines/{fine}/pay', [FineController::class, 'pay'])->name('fines.pay');
-    Route::put('fines/{fine}/waive', [FineController::class, 'waive'])->name('fines.waive');
-    Route::get('members/{member}/fines', [FineController::class, 'memberFines'])->name('members.fines');
-    Route::get('fines/export', [FineController::class, 'export'])->name('fines.export');
-});
 
 
 Route::middleware(['auth'])->group(function () {
@@ -64,104 +47,33 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/roles/{role}/suspend', [RoleController::class, 'suspend'])->name('roles.suspend');
     Route::put('/roles/{role}/assign-permissions', [RoleController::class, 'assignPermissions'])->name('roles.assign-permissions');
     Route::get('/roles/{role}/permissions', [RoleController::class, 'permissions'])->name('roles.permissions');
-    Route::get('/permissions', [RoleController::class, 'permissions'])->name('permissions');
     Route::get('/teachers', [TeacherController::class, 'index'])->name('teachers.index');
 
+    Route::get('/fee-types', [FeetypeController::class, 'index'])->name('fee-types.index');
+    Route::get('/fee-types/create', [FeetypeController::class, 'create'])->name('fee-types.create');
+    Route::post('/fee-types', [FeetypeController::class, 'store'])->name('fee-types.store');
+    Route::get('/fee-types/{feetype}', [FeetypeController::class, 'show'])->name('fee-types.show');
+    Route::get('/fee-types/{feetype}/edit', [FeetypeController::class, 'edit'])->name('fee-types.edit');
+    Route::put('/fee-types/{feetype}', [FeetypeController::class, 'update'])->name('fee-types.update');
+    Route::delete('/fee-types/{feetype}', [FeetypeController::class, 'destroy'])->name('fee-types.destroy');
+
+
+
+
+
+        Route::get('permissions', [PermissionController::class, 'index'])
+        ->middleware('can:permissions.view')->name('permissions');
+    Route::put('permissions/{role}', [PermissionController::class, 'update'])
+        ->middleware('can:permissions.update')->name('permissions.update');
+
 });
 
 
 
 
 
-Route::middleware(['auth'])->group(function () {
-    // Loan Eligibility
-    Route::get('/loans/eligibility', [LoanController::class, 'eligibilityForm'])
-        ->name('loans.eligibility.form');
-    Route::post('/loans/eligibility', [LoanController::class, 'checkEligibility'])
-        ->name('loans.eligibility.check');
-
-    // Loan Application
-    Route::post('/loans/apply', [LoanController::class, 'apply'])->name('loans.apply');
-
-    // Loan Type Pages
-    Route::get('/loans/instant', [LoanController::class, 'instant'])->name('loans.instant');
-    Route::get('/loans/ordinary', [LoanController::class, 'ordinary'])->name('loans.ordinary');
-
-    // API Routes
-    Route::get('/loans/duration-tiers', [LoanController::class, 'getDurationTiers'])->name('loans.duration-tiers');
-
-    // Resource routes (this handles index, show, store, update, destroy)
-    Route::resource('loans', LoanController::class)->only(['index', 'show']);
-
-    // Additional custom routes
-    Route::get('/loans/status/{status}', [LoanController::class, 'byStatus'])->name('loans.by-status');
-    
-    // Loan Actions
-    Route::put('/loans/{loan}/approve', [LoanController::class, 'approve'])->name('loans.approve');
-    Route::put('/loans/{loan}/activate', [LoanController::class, 'activate'])->name('loans.activate');
-    Route::put('/loans/{loan}/cancel', [LoanController::class, 'cancel'])->name('loans.cancel');
-    Route::put('/loans/{loan}/complete', [LoanController::class, 'complete'])->name('loans.complete');
-});
 
 
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
-
-// Analytics
-Route::get('/analytics', function () {
-    return view('analytics');
-})->name('analytics');
-
-
-
-
-// Products
-Route::get('/products', function () {
-    return view('products.index');
-})->name('products.index');
-
-Route::get('/products/create', function () {
-    return view('products.create');
-})->name('products.create');
-
-Route::get('/products/categories', function () {
-    return view('products.categories');
-})->name('products.categories');
-
-// Orders
-Route::get('/orders', function () {
-    return view('orders.index');
-})->name('orders.index');
-
-
-// Settings
-Route::get('/settings', function () {
-    return view('settings');
-})->name('settings');
-
-// Help
-Route::get('/help', function () {
-    return view('help');
-})->name('help');
-
-// Profile
-Route::get('/profile', function () {
-    return view('profile.edit');
-})->name('profile.edit');
-
-
-Route::get('/', function () {
-    return redirect()->route('dashboard');
-});
-
-
-
-// Ordinary Loans
-Route::get('/loans/ordinary', function () {
-    return view('loans.ordinary');
-})->name('loans.ordinary');
 
 
 

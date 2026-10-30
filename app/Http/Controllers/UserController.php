@@ -4,12 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Role;
+use App\Http\Controllers\Concerns\AuthorizesCrud;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
-class UserController extends Controller
+class UserController extends Controller implements HasMiddleware
 {
+    use AuthorizesCrud;
+        
+protected static string $permissionModule = 'users';
+
     public function index(Request $request)
     {
         $query = User::with('role');
@@ -105,7 +111,7 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $roles = Role::all();
-        return view('users.users-form', compact('user', 'roles'));
+        return view('users.form', compact('user', 'roles'));
     }
 
     public function update(Request $request, User $user)
