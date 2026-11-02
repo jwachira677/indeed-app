@@ -1,14 +1,18 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SavingController;
+use App\Http\Controllers\GradeLevelController;
+use App\Http\Controllers\SchoolClassController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Fee\FeetypeController;
-use App\Http\Controllers\LoanController;
+use App\Http\Controllers\Fee\FeeStructureController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\StreamController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\EnrollmentController;
 Route::get('/', function () {
     return view('welcome');
 });
@@ -49,13 +53,26 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/roles/{role}/permissions', [RoleController::class, 'permissions'])->name('roles.permissions');
     Route::get('/teachers', [TeacherController::class, 'index'])->name('teachers.index');
 
-    Route::get('/fee-types', [FeetypeController::class, 'index'])->name('fee-types.index');
-    Route::get('/fee-types/create', [FeetypeController::class, 'create'])->name('fee-types.create');
-    Route::post('/fee-types', [FeetypeController::class, 'store'])->name('fee-types.store');
-    Route::get('/fee-types/{feetype}', [FeetypeController::class, 'show'])->name('fee-types.show');
-    Route::get('/fee-types/{feetype}/edit', [FeetypeController::class, 'edit'])->name('fee-types.edit');
-    Route::put('/fee-types/{feetype}', [FeetypeController::class, 'update'])->name('fee-types.update');
-    Route::delete('/fee-types/{feetype}', [FeetypeController::class, 'destroy'])->name('fee-types.destroy');
+    // Route::get('/fee-types', [FeetypeController::class, 'index'])->name('fee-types.index');
+    // Route::get('/fee-types/create', [FeetypeController::class, 'create'])->name('fee-types.create');
+    // Route::post('/fee-types', [FeetypeController::class, 'store'])->name('fee-types.store');
+    // Route::get('/fee-types/{feetype}', [FeetypeController::class, 'show'])->name('fee-types.show');
+    // Route::get('/fee-types/{feetype}/edit', [FeetypeController::class, 'edit'])->name('fee-types.edit');
+    // Route::put('/fee-types/{feetype}', [FeetypeController::class, 'update'])->name('fee-types.update');
+    // Route::delete('/fee-types/{feetype}', [FeetypeController::class, 'destroy'])->name('fee-types.destroy');
+
+    Route::resource('fee-types', FeetypeController::class);
+    Route::resource('fee-structures', FeeStructureController::class);
+
+    Route::resource('grade-levels', GradeLevelController::class);
+    Route::resource('classes', SchoolClassController::class);
+    Route::resource('streams', StreamController::class);
+    Route::resource('students', StudentController::class);
+
+    Route::resource('enrollments', EnrollmentController::class);
+    Route::get('students/{student}/enroll', [EnrollmentController::class, 'create'])->name('students.enroll');
+    Route::post('students/{student}/enroll', [EnrollmentController::class, 'store'])->name('students.enroll.store');
+
 
 
 

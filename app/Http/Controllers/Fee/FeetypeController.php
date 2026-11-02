@@ -59,7 +59,7 @@ public function index(Request $request)
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(FeeType $feeType)
     {
         //
     }
@@ -67,23 +67,46 @@ public function index(Request $request)
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(FeeType $feeType)
     {
-        //
+         return view('fee.fee_types.form', compact('feeType'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+public function update(Request $request, FeeType $feeType)
     {
-        //
+        $validated = $request->validate([
+            'code'              => ['required', 'string', 'max:30', 'unique:fee_types,code,' . $feeType->id],
+            'name'              => ['required', 'string', 'max:100'],
+            'description'       => ['nullable', 'string'],
+            'billing_frequency' => ['required', 'in:PER_TERM,PER_MONTH,PER_YEAR,ONE_OFF'],
+            'is_optional'       => ['nullable', 'boolean'],
+            'is_active'         => ['nullable', 'boolean'],
+        ]);
+
+        try {
+            $feeType->update([
+                'code'              => strtoupper($validated['code']),
+                'name'              => $validated['name'],
+                'description'       => $validated['description'] ?? null,
+                'billing_frequency' => $validated['billing_frequency'],
+                'is_optional'       => $request->boolean('is_optional'),
+                'is_active'         => $request->boolean('is_active'),
+            ]);
+
+            return redirect()->route('fee-types.index')->with('success', 'Fee Type updated successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Error updating fee type: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Failed to update fee type.');
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(FeeType $feeType)
     {
         //
     }

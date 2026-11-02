@@ -22,13 +22,17 @@ return [
         // Students & Academic
         'students'           => ['label' => 'Students',           'actions' => [...$crud, 'export']],
         'enrollments'        => ['label' => 'Enrollments',        'actions' => $crud],
+        
+        // Added Grade Levels here to match the sidebar grouping
+        'grade_levels'       => ['label' => 'Grade Levels',       'actions' => $crud], 
+        
         'classes'            => ['label' => 'Classes',            'actions' => $crud],
+        'streams'            => ['label' => 'Streams',            'actions' => $crud],
         'teachers'           => ['label' => 'Teachers',           'actions' => [...$crud, 'export']],
         'academic_years'     => ['label' => 'Academic Years',     'actions' => $crud],
         'terms'              => ['label' => 'Terms',              'actions' => $crud],
 
         // CBC Curriculum
-        'grades'             => ['label' => 'Grade Levels',       'actions' => $crud],
         'subjects'           => ['label' => 'Subjects',           'actions' => $crud],
         'pathways'           => ['label' => 'Pathways',           'actions' => $crud],
         'curriculum_mapping' => ['label' => 'Curriculum Mapping', 'actions' => $crud],
@@ -46,8 +50,7 @@ return [
         'permissions'        => ['label' => 'Permissions',        'actions' => ['view', 'update']],
         'settings'           => ['label' => 'Settings',           'actions' => ['view', 'update']],
 
-
-        'examinations'      => ['label' => 'Examinations', 'actions' => [...$crud, 'export']],
+        'examinations'       => ['label' => 'Examinations',       'actions' => [...$crud, 'export']],
     ],
 
     /*
@@ -65,7 +68,7 @@ return [
             'students.view',
             'classes.view',
             'subjects.view',
-            'grades.view',
+            'grade_levels.view', // Updated from 'grades.view' to match the new module name
             'enrollments.view',
             'teachers.view',
         ],

@@ -49,6 +49,7 @@
             color: #fff !important;
             transform: translateX(4px);
         }
+        .sidebar-collapsed .sidebar-wrapper { display: none !important; }
         
         .sidebar .nav-link .bi-chevron-down {
             transition: transform 0.3s ease;
@@ -103,11 +104,15 @@
     </style>
 </head>
 <body>
+    <body>
+<script>
+    try { if (localStorage.getItem('sidebarCollapsed') === '1') document.body.classList.add('sidebar-collapsed'); } catch (e) {}
+</script>
 <div class="main-wrapper">
     {{-- Desktop Sidebar --}}
-    <div class="d-none d-lg-block">
-        <x-sidebar />
-    </div>
+<div class="d-none d-lg-block sidebar-wrapper">
+    <x-sidebar />
+</div>
 
     {{-- Main Content Area --}}
     <div class="main-content">
@@ -152,6 +157,10 @@
                     document.querySelector('.header').style.borderBottomColor = '1px solid rgba(0,0,0,0.04)';
                 }
             });
+            document.getElementById('sidebarCollapseBtn')?.addEventListener('click', function () {
+    const collapsed = document.body.classList.toggle('sidebar-collapsed');
+    try { localStorage.setItem('sidebarCollapsed', collapsed ? '1' : '0'); } catch (e) {}
+});
         });
     </script>
 </body>

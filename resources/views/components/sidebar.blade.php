@@ -12,7 +12,7 @@
             </div>
             <div>
                 <span class="fs-5 fw-bold text-white">School</span>
-                <span class="d-block small text-secondary" style="font-size: 0.65rem; letter-spacing: 1px;">CBC ADMIN PANEL</span>
+                <span class="d-block small text-secondary" style="font-size: 0.65rem; letter-spacing: 1px;">ADMIN PANEL</span>
             </div>
         </a>
     </div>

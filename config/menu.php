@@ -35,8 +35,11 @@ return [
         'children' => [
             ['label' => 'Students',    'icon' => 'bi-person',          'route' => 'students.index',    'permission' => 'students.view'],
             ['label' => 'Enrollments', 'icon' => 'bi-clipboard-check', 'route' => 'enrollments.index', 'permission' => 'enrollments.view'],
+            ['label' => 'Streams', 'icon' => 'bi-signpost-split',       'route' => 'streams.index', 'permission' => 'streams.view'],
+            ['label' => 'Grade Levels','icon' => 'bi-layers',          'route' => 'grade-levels.index','permission' => 'grade_levels.view'],
+            
             ['label' => 'Classes',     'icon' => 'bi-door-open',       'route' => 'classes.index',     'permission' => 'classes.view'],
-            ['label' => 'Teachers',    'icon' => 'bi-person-workspace', 'route' => 'teachers.index',   'permission' => 'teachers.view'],
+            ['label' => 'Teachers',    'icon' => 'bi-person-workspace','route' => 'teachers.index',    'permission' => 'teachers.view'],
             [
                 'label' => 'Academic Calendar',
                 'icon' => 'bi-calendar3',
@@ -52,7 +55,6 @@ return [
         'label' => 'CBC Curriculum',
         'icon' => 'bi-journal-bookmark',
         'children' => [
-            ['label' => 'Grade Levels', 'icon' => 'bi-layers',        'route' => 'grades.index',   'permission' => 'grades.view'],
             ['label' => 'Subjects',     'icon' => 'bi-book',          'route' => 'subjects.index', 'permission' => 'subjects.view'],
             ['label' => 'Pathways',     'icon' => 'bi-signpost-split', 'route' => 'pathways.index', 'permission' => 'pathways.view'],
             [

@@ -11,20 +11,11 @@
                 data-bs-target="#sidebarOffcanvas">
             <i class="bi bi-list fs-2"></i>
         </button>
-
-        {{-- Search Bar --}}
-        <div class="search-wrapper position-relative d-none d-md-block">
-            <i class="bi bi-search position-absolute text-secondary" 
-               style="top: 50%; left: 16px; transform: translateY(-50%); font-size: 0.9rem;"></i>
-            <input type="text" 
-                   class="form-control bg-light border-0 rounded-pill ps-5" 
-                   placeholder="Search for anything..." 
-                   style="width: 320px; height: 42px; font-size: 0.9rem;">
-            <kbd class="position-absolute text-secondary" 
-                 style="top: 50%; right: 16px; transform: translateY(-50%); font-size: 0.65rem; background: #e9ecef; border: 1px solid #dee2e6;">
-                ⌘K
-            </kbd>
-        </div>
+        {{-- Desktop sidebar toggle --}}
+        <button class="btn btn-link text-dark p-0 d-none d-lg-inline-block"
+                type="button" id="sidebarCollapseBtn" title="Toggle sidebar">
+            <i class="bi bi-list fs-2"></i>
+        </button>
     </div>
 
     {{-- Right Side: Actions --}}
