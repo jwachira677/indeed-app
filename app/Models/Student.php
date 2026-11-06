@@ -16,8 +16,8 @@ class Student extends Model
         'guardian_name',
         'date_of_birth',
         'gender',
+        'transport_route_id',
     ];
-
     protected $casts = [
         'date_of_birth' => 'date',
     ];
@@ -37,5 +37,9 @@ class Student extends Model
         return $this->hasOne(StudentEnrollment::class)
                     ->where('status', StudentEnrollment::STATUS_ACTIVE)
                     ->latestOfMany();
+    }
+    public function transportRoute()
+    {
+        return $this->belongsTo(TransportRoute::class);
     }
 }

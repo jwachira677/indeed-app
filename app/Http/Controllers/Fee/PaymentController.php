@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Fee;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
-class PaymentController extends Controller
+use App\Http\Controllers\Concerns\AuthorizesCrud;
+use Illuminate\Routing\Controllers\HasMiddleware;
+class PaymentController extends Controller implements HasMiddleware
 {
+    use AuthorizesCrud;
+    //protected static string $permissionModule = 'fee_payments';
     /**
      * Display a listing of the resource.
      */

@@ -6,10 +6,14 @@ use App\Models\Role;
 Use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Concerns\AuthorizesCrud;
 
-class TeacherController extends Controller
+class TeacherController extends Controller implements HasMiddleware
 {
+      use AuthorizesCrud;
+      protected static string $permissionModule = 'teachers';
      public function index(Request $request)
     {
         try {

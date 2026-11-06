@@ -10,9 +10,13 @@ use App\Models\GradeLevel;
 use App\Models\FeeType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-
-class FeeStructureController extends Controller
+use App\Http\Controllers\Concerns\AuthorizesCrud;
+use Illuminate\Routing\Controllers\HasMiddleware;
+class FeeStructureController extends Controller implements HasMiddleware
 {
+    use AuthorizesCrud;
+    protected static string $permissionModule = 'fee_structures';
+
     public function index(Request $request)
     {
         try {

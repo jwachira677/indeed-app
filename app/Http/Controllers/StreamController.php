@@ -5,9 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Stream;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-
-class StreamController extends Controller
+use App\Http\Controllers\Concerns\AuthorizesCrud;
+use Illuminate\Routing\Controllers\HasMiddleware;
+class StreamController extends Controller implements HasMiddleware
 {
+    use AuthorizesCrud;
+    protected static string $permissionModule = 'streams';
+
     public function index()
     {
         try {

@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Fee;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\FeeType;
-class FeetypeController extends Controller
+use App\Http\Controllers\Concerns\AuthorizesCrud;
+use Illuminate\Routing\Controllers\HasMiddleware;
+class FeetypeController extends Controller implements HasMiddleware
 {
-    /**
-     * Display a listing of the resource.
-     */
+    use AuthorizesCrud;
+    protected static string $permissionModule = 'fee_types';
+
+
 public function index(Request $request)
 {
     try {

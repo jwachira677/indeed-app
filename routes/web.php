@@ -13,6 +13,8 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\StreamController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\TransportRouteController;
+use App\Http\Controllers\VehicleController;
 Route::get('/', function () {
     return view('welcome');
 });
@@ -53,13 +55,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/roles/{role}/permissions', [RoleController::class, 'permissions'])->name('roles.permissions');
     Route::get('/teachers', [TeacherController::class, 'index'])->name('teachers.index');
 
-    // Route::get('/fee-types', [FeetypeController::class, 'index'])->name('fee-types.index');
-    // Route::get('/fee-types/create', [FeetypeController::class, 'create'])->name('fee-types.create');
-    // Route::post('/fee-types', [FeetypeController::class, 'store'])->name('fee-types.store');
-    // Route::get('/fee-types/{feetype}', [FeetypeController::class, 'show'])->name('fee-types.show');
-    // Route::get('/fee-types/{feetype}/edit', [FeetypeController::class, 'edit'])->name('fee-types.edit');
-    // Route::put('/fee-types/{feetype}', [FeetypeController::class, 'update'])->name('fee-types.update');
-    // Route::delete('/fee-types/{feetype}', [FeetypeController::class, 'destroy'])->name('fee-types.destroy');
+    Route::resource('transport-routes', TransportRouteController::class);
+    Route::resource('vehicles', VehicleController::class);
+
+
 
     Route::resource('fee-types', FeetypeController::class);
     Route::resource('fee-structures', FeeStructureController::class);

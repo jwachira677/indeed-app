@@ -7,9 +7,13 @@ use App\Models\Student;
 use App\Models\SchoolClass;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-
-class EnrollmentController extends Controller
+use App\Http\Controllers\Concerns\AuthorizesCrud;
+use Illuminate\Routing\Controllers\HasMiddleware;
+class EnrollmentController extends Controller implements HasMiddleware
 {
+    use AuthorizesCrud;
+    protected static string $permissionModule = 'enrollments';
+
     public function index()
     {
         try {

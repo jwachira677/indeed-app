@@ -51,6 +51,11 @@ return [
         'settings'           => ['label' => 'Settings',           'actions' => ['view', 'update']],
 
         'examinations'       => ['label' => 'Examinations',       'actions' => [...$crud, 'export']],
+
+        //Transport
+
+        'transport_routes'   => ['label' => 'Transport Routes',   'actions' => $crud],
+        'vehicles'           => ['label' => 'Vehicles',           'actions' => $crud],
     ],
 
     /*

@@ -63,6 +63,19 @@
                             </select>
                             @error('gender') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
+                        <!-- In Student Form -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Transport Route</label>
+                            <select name="transport_route_id" class="form-select @error('transport_route_id') is-invalid @enderror">
+                                <option value="">No Transport</option>
+                                @foreach($transportRoutes as $route)
+                                    <option value="{{ $route->id }}" {{ old('transport_route_id', $student->transport_route_id ?? '') == $route->id ? 'selected' : '' }}>
+                                        {{ $route->name }} (KES {{ number_format($route->amount, 2) }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('transport_route_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
 
                         <hr class="my-4 text-muted">
 

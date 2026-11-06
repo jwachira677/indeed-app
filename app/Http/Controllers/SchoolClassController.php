@@ -8,9 +8,13 @@ use App\Models\AcademicYear;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Models\Stream;
+use App\Http\Controllers\Concerns\AuthorizesCrud;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class SchoolClassController extends Controller
+class SchoolClassController extends Controller implements HasMiddleware
 {
+    use AuthorizesCrud;
+    protected static string $permissionModule = 'classes';
     public function index()
     {
         try {

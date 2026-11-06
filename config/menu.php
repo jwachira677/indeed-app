@@ -100,5 +100,13 @@ return [
             ['label' => 'Results', 'icon' => 'bi-award',         'route' => 'results.index', 'permission' => 'examinations.view'],
         ],
     ],
+    [
+        'label' => 'Transport',
+        'icon' => 'bi-truck',
+        'children' => [
+            ['label' => 'Transport Routes', 'icon' => 'bi-signpost-split', 'route' => 'transport-routes.index', 'permission' => 'transport_routes.view'],
+            ['label' => 'Vehicles',         'icon' => 'bi-truck',          'route' => 'vehicles.index',         'permission' => 'vehicles.view'],
+        ],
+    ],
 
 ];
