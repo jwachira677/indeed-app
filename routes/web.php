@@ -71,6 +71,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('enrollments', EnrollmentController::class);
     Route::get('students/{student}/enroll', [EnrollmentController::class, 'create'])->name('students.enroll');
     Route::post('students/{student}/enroll', [EnrollmentController::class, 'store'])->name('students.enroll.store');
+    Route::get('/students/{student}/fees', [StudentController::class, 'fees'])->name('students.fees');
 
 
 

@@ -2,6 +2,7 @@
 namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 class Student extends Model
 {
@@ -42,4 +43,43 @@ class Student extends Model
     {
         return $this->belongsTo(TransportRoute::class);
     }
+    public function getFeeBreakdown($termId)
+    {
+    $breakdown = collect();
+
+    // 1. Get Class-Based Fees
+    $classId = $this->currentEnrollment?->class_id;
+
+    if ($classId) {
+        $classFees = \App\Models\ClassFeeStructure::with('feeType')
+            ->where('class_id', $classId)
+            ->where('term_id', $termId)
+            ->get();
+
+        foreach ($classFees as $fee) {
+            $breakdown->push([
+                'source'      => 'Class',
+                'name'        => $fee->feeType->name ?? 'Unnamed Fee',
+                'description' => $fee->feeType->description ?? null,
+                'amount'      => (float) $fee->amount,
+                'is_optional' => (bool) $fee->is_optional,
+                'due_date'    => $fee->due_date,
+            ]);
+        }
+    }
+
+    // 2. Get Transport Fee
+    if ($this->transportRoute && $this->transportRoute->is_active) {
+        $breakdown->push([
+            'source'      => 'Transport',
+            'name'        => 'Transport: ' . $this->transportRoute->name,
+            'description' => 'Daily transport service',
+            'amount'      => (float) $this->transportRoute->amount,
+            'is_optional' => false, // Transport is typically compulsory if assigned
+            'due_date'    => null,
+        ]);
+    }
+
+    return $breakdown;
+}
 }

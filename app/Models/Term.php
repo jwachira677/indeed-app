@@ -49,7 +49,9 @@ class Term extends Model
      */
     public function getDisplayNameAttribute()
     {
-        $year = $this->academicYear ? $this->academicYear->name : ''; // Assuming academic_years has a 'name' field
-        return "Term {$this->term_number} " . ($year ? "- {$year}" : '');
+        // Note: using year_name instead of name
+        $year = $this->academicYear ? $this->academicYear->year_name : ''; 
+        
+        return "Term {$this->term_number}" . ($year ? " - {$year}" : '');
     }
 }
